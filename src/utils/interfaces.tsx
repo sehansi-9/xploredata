@@ -24,6 +24,23 @@ interface Dataset {
   kind: Kind;
 }
 
+interface DatasetData {
+  attributeName: string;
+  columns: string[],
+  rows: any[]
+}
+
+interface ExportButtonProps {
+  columns: string[]
+  rows: (string | number)[][]
+  filename: string
+}
+
+interface DataTableProps {
+  columns: string[];
+  rows: (string | number)[][];
+  title: string;
+}
 interface SidebarProps {
   onSelectDataset: (dataset: Dataset) => void;
 }

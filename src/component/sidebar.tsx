@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Database } from "lucide-react";
 import axios from "axios";
 import formatText from "@/utils/common_functions";
 import { ClipLoader } from "react-spinners";
 
 export function Sidebar({ onSelectDataset }: SidebarProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [categoriesByParentId, setCategoriesByParentId] = useState<Map<string, Category[]>>(new Map());
   const [datasetsByParentId, setDatasetsByParentId] = useState<Map<string, Dataset[]>>(new Map());
@@ -14,6 +18,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [initialLoading, setInitialLoading] = useState(false);
   const [loadingCategoryId, setLoadingCategoryId] = useState<string | null>(null);
+  const [isRestoringFromUrl, setIsRestoringFromUrl] = useState(false);
 
   // Fetch categories and datasets for a given parentId
   const fetchCategoriesAndDatasets = async (parentId: string = "") => {
@@ -35,7 +40,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
         return newMap;
       });
 
-      if (Object.keys(datasets).length !== 0) {
+      if (datasets && Object.keys(datasets).length !== 0) {
         const allDatasets = Object.values(datasets).flat();
         setDatasetsByParentId((prev) => {
           const newMap = new Map(prev);
@@ -43,41 +48,31 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           return newMap;
         });
       }
+
+      return { categories, datasets };
     } catch (e) {
       console.error("Failed to fetch categories:", e);
+      return { categories: [], datasets: {} };
     }
   };
 
+  // Update URL when dataset is clicked
+  const updateUrl = (dataset: Dataset) => {
+    const params = new URLSearchParams();
+    params.set('datasetId', dataset.id);
+    params.set('datasetName', dataset.nameExact || dataset.name);
+    if (dataset.year) {
+      params.set('year', dataset.year);
+    }
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
   // When dataset is clicked
-  const handleDatasetClick = async (
-    datasetId: string,
-    datasetNameCode: string,
-    datasetParentId: string,
-    datasetYear?: string
-  ) => {
+  const handleDatasetClick = async (dataset: Dataset) => {
     try {
-      setLoadingDatasetId(datasetId);
-      const response = await axios.post<Dataset>(
-        `${process.env.NEXT_PUBLIC_API_URL}/data/attribute/${datasetParentId}`,
-        {
-          nameCode: datasetNameCode,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      // Add year information to the dataset
-      const datasetWithYear = {
-        ...response.data,
-        year: datasetYear
-      };
-
-      console.log(datasetWithYear)
-
-      onSelectDataset(datasetWithYear);
+      setLoadingDatasetId(dataset.id);
+      updateUrl(dataset);
+      onSelectDataset(dataset);
     } catch (e) {
       console.error("Failed to fetch dataset:", e);
     } finally {
@@ -85,16 +80,77 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     }
   };
 
-  // Initial load
+  // Recursively expand categories to find a dataset
+  const expandPathToDataset = async (datasetId: string, parentId: string = ""): Promise<boolean> => {
+    // Fetch this level if not already fetched
+    if (!categoriesByParentId.has(parentId)) {
+      await fetchCategoriesAndDatasets(parentId);
+    }
+
+    const datasets = datasetsByParentId.get(parentId) || [];
+    
+    // Check if dataset is at this level
+    if (datasets.some(ds => ds.id === datasetId)) {
+      return true;
+    }
+
+    // Check child categories
+    const categories = categoriesByParentId.get(parentId) || [];
+    for (const category of categories) {
+      const found = await expandPathToDataset(datasetId, category.id);
+      if (found) {
+        setExpandedCategories(prev => new Set([...prev, category.id]));
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  // Restore state from URL on mount
   useEffect(() => {
-    const fetchData = async () => {
-      setInitialLoading(true);
-      await fetchCategoriesAndDatasets();
-      setInitialLoading(false);
+    const restoreFromUrl = async () => {
+      const datasetId = searchParams.get('datasetId');
+      const datasetName = searchParams.get('datasetName');
+      const year = searchParams.get('year');
+
+      if (datasetId && datasetName) {
+        setIsRestoringFromUrl(true);
+        setInitialLoading(true);
+
+        try {
+          // First load root categories
+          await fetchCategoriesAndDatasets();
+          
+          // Expand path to the dataset
+          await expandPathToDataset(datasetId);
+
+          // Create dataset object from URL params
+          const dataset: Dataset = {
+            id: datasetId,
+            name: datasetName,
+            nameExact: datasetName,
+            year: year || undefined,
+          };
+
+          // Select the dataset
+          onSelectDataset(dataset);
+        } catch (e) {
+          console.error("Failed to restore from URL:", e);
+        } finally {
+          setInitialLoading(false);
+          setIsRestoringFromUrl(false);
+        }
+      } else {
+        // Normal initial load
+        setInitialLoading(true);
+        await fetchCategoriesAndDatasets();
+        setInitialLoading(false);
+      }
     };
 
-    fetchData();
-  }, []);
+    restoreFromUrl();
+  }, []); // Only run on mount
 
   // Toggle expansion of a category
   const toggleCategory = async (categoryId: string) => {
@@ -120,6 +176,8 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
   const renderCategories = (parentId: string = "", level: number = 0) => {
     const categories = categoriesByParentId.get(parentId) || [];
     const datasets = datasetsByParentId.get(parentId) || [];
+    
+    const currentDatasetId = searchParams.get('datasetId');
 
     return (
       <div className="space-y-1">
@@ -131,7 +189,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
             <div key={category.id}>
               <button
                 onClick={() => toggleCategory(category.id)}
-                className={`w-full flex items-center gap-2 text-start px-3 py-2 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground`}
+                className={`w-full hover:cursor-pointer flex items-center gap-2 text-start px-3 py-2 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground`}
                 style={{ paddingLeft: `${level * 1.25 + 1}rem` }}
               >
                 <ChevronDown
@@ -157,19 +215,15 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
 
         {datasets.map((dataset) => {
           const isLoadingDataset = loadingDatasetId === dataset.id;
-          // Extract year from dataset ID (assuming format like "cat_a046794d1f_attr_367c1f457e_2022_cat_a046794d1f")
-          const yearMatch = dataset.id.match(/_(\d{4})_/);
-          const datasetYear = yearMatch ? yearMatch[1] : undefined;
-
+          const isSelected = currentDatasetId === dataset.id;
+          
           return (
             <button
               key={dataset.id}
-              onClick={() =>
-                handleDatasetClick(dataset.id, dataset.name, dataset.parentId, datasetYear)
-              }
+              onClick={() => handleDatasetClick(dataset)}
               className={`w-full text-left px-3 py-2 hover:cursor-pointer rounded-md text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground ${
                 isLoadingDataset ? "opacity-50 pointer-events-none" : ""
-              }`}
+              } ${isSelected ? "bg-sidebar-accent font-medium" : ""}`}
               style={{ paddingLeft: `${(level + 1) * 1.25 + 1}rem` }}
             >
               {isLoadingDataset ? "Loading..." : dataset.nameExact || dataset.name}
@@ -191,12 +245,12 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
       </div>
 
       {/* Search */}
-      <input
+      {/* <input
         placeholder="Search datasets..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         className="m-2 p-2 rounded-sm border-2"
-      />
+      /> */}
 
       {/* Body */}
       {initialLoading ? (

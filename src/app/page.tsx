@@ -29,7 +29,6 @@ import {
 } from "recharts";
 
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
-import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
 import FloatingDots from "@/component/floating-dots";
 

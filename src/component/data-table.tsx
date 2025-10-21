@@ -6,12 +6,6 @@ import { Button, TextField } from "@radix-ui/themes";
 import formatText from "@/utils/common_functions";
 import { ExportButton } from "./export-button";
 
-interface DataTableProps {
-  columns: string[];
-  rows: (string | number)[][];
-  title?: string;
-}
-
 type SortDirection = "asc" | "desc" | null;
 
 export function DataTable({ columns, rows, title }: DataTableProps) {
@@ -90,15 +84,15 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
       </div>
 
       {/* Table */}
-      <div className="border border-gray-300 rounded-lg overflow-x-auto">
+      <div className="border border-border rounded-lg overflow-x-auto">
         <table className="w-full min-w-max text-sm">
           <thead>
-            <tr className="bg-gray-100 border-b border-gray-300">
+            <tr className="bg-muted border-b border-border">
               {columns.map((column, index) => (
                 <th key={index} className="px-4 py-3 text-left">
                   <button
                     onClick={() => handleSort(index)}
-                    className="flex items-center gap-2 font-semibold hover:text-orange-600 transition-colors whitespace-nowrap"
+                    className="flex items-center gap-2 font-semibold text-sm hover:text-accent transition-colors whitespace-nowrap hover:cursor-pointer"
                   >
                     {formatText({ name: column })}
                     {sortColumn === index &&
@@ -117,7 +111,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
               paginatedRows.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                  className="border-b border-border hover:bg-muted/50 transition-colors"
                 >
                   {row.map((cell, cellIndex) => (
                     <td key={cellIndex} className="px-4 py-3 whitespace-nowrap">
@@ -142,7 +136,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
 
       {/* Pagination */}
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Showing{" "}
           {paginatedRows.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}{" "}
           to {Math.min(currentPage * itemsPerPage, sortedRows.length)} of{" "}
@@ -152,7 +146,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
         <div className="flex gap-2">
           <Button
             variant="outline"
-            size="1"
+            size="2"
             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
             disabled={currentPage === 1}
           >
@@ -160,7 +154,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
           </Button>
           <Button
             variant="outline"
-            size="1"
+            size="2"
             onClick={() =>
               setCurrentPage(Math.min(totalPages, currentPage + 1))
             }
