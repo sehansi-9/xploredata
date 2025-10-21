@@ -61,6 +61,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     const params = new URLSearchParams();
     params.set('datasetId', dataset.id);
     params.set('datasetName', dataset.nameExact || dataset.name);
+    params.set('parentId', dataset.parentId || '');
     if (dataset.year) {
       params.set('year', dataset.year);
     }
@@ -112,9 +113,10 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     const restoreFromUrl = async () => {
       const datasetId = searchParams.get('datasetId');
       const datasetName = searchParams.get('datasetName');
+      const datasetParentId = searchParams.get('parentId');
       const year = searchParams.get('year');
 
-      if (datasetId && datasetName) {
+      if (datasetId && datasetName && datasetParentId) {
         setIsRestoringFromUrl(true);
         setInitialLoading(true);
 
@@ -130,6 +132,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
             id: datasetId,
             name: datasetName,
             nameExact: datasetName,
+            parentId: datasetParentId,
             year: year || undefined,
           };
 
