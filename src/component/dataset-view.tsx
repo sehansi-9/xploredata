@@ -3,10 +3,33 @@
 import { ChartVisualization } from "./chart-visualization"
 import { DataTable } from "./data-table"
 import { ExportButton } from "./export-button"
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState, useRef } from "react"
+import { ChevronDown } from "lucide-react"
 
-export function DatasetView({ data }: DatasetViewProps) {
+export function DatasetView({ data, availableYears = [], onYearChange, onComparisonChange }: DatasetViewProps) {
   const dataset = data;
+  const [selectedYear, setSelectedYear] = useState<string>(dataset.year || "");
+  const [showYearDropdown, setShowYearDropdown] = useState<boolean>(false);
+  const [showComparisonDropdown, setShowComparisonDropdown] = useState<boolean>(false);
+  const yearDropdownRef = useRef<HTMLDivElement>(null);
+  const comparisonDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (yearDropdownRef.current && !yearDropdownRef.current.contains(event.target as Node)) {
+        setShowYearDropdown(false);
+      }
+      if (comparisonDropdownRef.current && !comparisonDropdownRef.current.contains(event.target as Node)) {
+        setShowComparisonDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   console.log(data)
 
@@ -18,6 +41,12 @@ export function DatasetView({ data }: DatasetViewProps) {
     )
   }
 
+  const handleYearChange = (year: string) => {
+    setSelectedYear(year);
+    onYearChange?.(year);
+    setShowYearDropdown(false);
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-6 w-full">
       {/* Dataset Info */}
@@ -27,6 +56,34 @@ export function DatasetView({ data }: DatasetViewProps) {
           <p>
             <span className="font-semibold">Published By :</span> {dataset.source}
           </p>
+        </div>
+      </div>
+
+      {/* Year Selection Controls */}
+      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+        {/* Year Selection Dropdown */}
+        <div className="relative" ref={yearDropdownRef}>
+          <button
+            onClick={() => setShowYearDropdown(!showYearDropdown)}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <span>{selectedYear || "Select Year"}</span>
+            <ChevronDown className="w-4 h-4" />
+          </button>
+          
+          {showYearDropdown && (
+            <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+              {availableYears.map((year) => (
+                <button
+                  key={year}
+                  onClick={() => handleYearChange(year)}
+                  className="w-full text-left px-4 py-2 hover:bg-gray-100 transition-colors"
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -42,18 +99,11 @@ export function DatasetView({ data }: DatasetViewProps) {
 
       {/* Data Table Card */}
       <div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white">
-        <div className="flex flex-col md:flex-row justify-end items-start md:items-center mb-4 gap-4">
-          <ExportButton
-            columns={dataset.columns}
-            rows={dataset.rows}
-            filename={dataset.attributeName}
-          />
-        </div>
         <div className="overflow-x-auto">
           <DataTable
             columns={dataset.columns}
             rows={dataset.rows}
-            title={dataset.title}
+            title={dataset.attributeName}
           />
         </div>
       </div>

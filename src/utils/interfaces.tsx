@@ -33,7 +33,19 @@ interface FetchedData {
   datasets?: Record<string, Dataset[]>;
 }
 
+interface YearBasedData {
+  categories: Category[];
+  datasets: Record<string, Dataset[]>;
+}
+
+interface DatasetWithYear extends Dataset {
+  year?: string;
+}
+
 interface DatasetViewProps {
-  data: Dataset
+  data: DatasetWithYear;
+  availableYears?: string[];
+  onYearChange?: (year: string) => void;
+  onComparisonChange?: (year1: string, year2: string) => void;
 }
 
