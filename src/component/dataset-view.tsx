@@ -5,12 +5,10 @@ import { DataTable } from "./data-table"
 import { ExportButton } from "./export-button"
 import { useEffect, useMemo } from "react"
 
-interface DatasetViewProps {
-  datasetId: string
-}
+export function DatasetView({ data }: DatasetViewProps) {
+  const dataset = data;
 
-export function DatasetView({ datasetId }: DatasetViewProps) {
-  const dataset = datasetId;
+  console.log(data)
 
   if (!dataset) {
     return (

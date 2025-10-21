@@ -32,3 +32,8 @@ interface FetchedData {
   categories: Category[];
   datasets?: Record<string, Dataset[]>;
 }
+
+interface DatasetViewProps {
+  data: Dataset
+}
+

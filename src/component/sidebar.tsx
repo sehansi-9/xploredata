@@ -16,10 +16,6 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     Map<string, Dataset[]>
   >(new Map());
   const [loadingDatasetId, setLoadingDatasetId] = useState<string | null>(null);
-  const [datasetApiDetails, setDatasetApiDetails] = useState({
-    datasetParentId: "",
-    datasetNameCode: "",
-  });
 
   const fetchCategoriesAndDatasets = async (parentId: string = "") => {
     try {
@@ -53,11 +49,13 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     }
   };
 
-  // Fetch dataset details when clicked
-  const handleDatasetClick = async (datasetId: string, datasetNameCode: string, datasetParentId: string) => {
+  const handleDatasetClick = async (
+    datasetId: string,
+    datasetNameCode: string,
+    datasetParentId: string
+  ) => {
     try {
       setLoadingDatasetId(datasetId);
-      setDatasetApiDetails({datasetNameCode: datasetNameCode, datasetParentId: datasetParentId})
       const response = await axios.post<Dataset>(
         `${process.env.NEXT_PUBLIC_API_URL}/data/attribute/${datasetParentId}`,
         {
@@ -69,7 +67,8 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           },
         }
       );
-
+      console.log("clicked ");
+      console.log(response.data);
       onSelectDataset(response.data);
     } catch (e) {
       console.error("Failed to fetch dataset:", e);
@@ -120,7 +119,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
                 }`}
               />
               <span className="text-sm font-medium">
-                {formatText({name: category.name})}
+                {formatText({ name: category.name })}
               </span>
             </button>
 
@@ -130,11 +129,12 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           </div>
         ))}
 
-        {/* Render datasets under this parent */}
         {datasets.map((dataset) => (
           <button
             key={dataset.id}
-            onClick={() => handleDatasetClick(dataset.id, dataset.name, dataset.parentId)}
+            onClick={() =>
+              handleDatasetClick(dataset.id, dataset.name, dataset.parentId)
+            }
             className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground ${
               loadingDatasetId === dataset.id
                 ? "opacity-50 pointer-events-none"
