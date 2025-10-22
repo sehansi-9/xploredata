@@ -97,24 +97,30 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
         <div>
           <label className="text-sm font-medium">Y-Axis (Values):</label>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mt-2">
-            {numericColumns.filter((col) => col !== "id").map((col) => (
-              <label key={col} className="flex items-center space-x-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={selectedYColumns.includes(col)}
-                  onChange={(e) => {
-                    setSelectedYColumns((prev) =>
-                      e.target.checked
-                        ? [...prev, col]
-                        : prev.filter((c) => c !== col)
-                    );
-                  }}
-                />
-                <span>{col}</span>
-              </label>
-            ))}
+            {numericColumns
+              .filter((col) => col !== "id")
+              .map((col) => (
+                <label
+                  key={col}
+                  className="flex items-start space-x-2 text-sm break-words"
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedYColumns.includes(col)}
+                    onChange={(e) => {
+                      setSelectedYColumns((prev) =>
+                        e.target.checked
+                          ? [...prev, col]
+                          : prev.filter((c) => c !== col)
+                      );
+                    }}
+                  />
+                  <span className="break-words max-w-[220px]">{col}</span>
+                </label>
+              ))}
           </div>
         </div>
+
       </div>
 
       {/* Chart */}
@@ -157,14 +163,14 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                   marginBottom: 60,
                 }}
               >
-  
+
                 {Array.from({ length: 5 }).map((_, i) => {
                   const maxVal = Math.max(
                     ...chartData.flatMap((d) =>
                       selectedYColumns.map((col) => d[col])
                     )
                   );
-                
+
                   const niceDomain = Math.ceil(maxVal / 5) * 5;
                   const tickVal = Math.round((niceDomain / 4) * (4 - i));
                   return (
