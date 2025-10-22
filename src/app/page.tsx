@@ -131,26 +131,23 @@ const DataTimeline = ({ activeYear, setActiveYear }) => {
             return (
               <div
                 key={year}
-                className={`flex flex-col items-center transition-all duration-500 select-none ${
-                  isActive ? "scale-70" : "scale-60"
-                }`}
+                className={`flex flex-col items-center transition-all duration-500 select-none ${isActive ? "scale-70" : "scale-60"
+                  }`}
                 onClick={() => setActiveYear(year)}
               >
                 <div
-                  className={`w-6 h-6 rounded-full mb-2 ${
-                    isPast
+                  className={`w-6 h-6 rounded-full mb-2 ${isPast
                       ? "bg-gradient-to-r from-cyan-400 to-blue-500 shadow-lg"
                       : "bg-slate-600"
-                  }`}
+                    }`}
                 />
                 <div
-                  className={`text-sm ${
-                    isActive
+                  className={`text-sm ${isActive
                       ? "text-white font-bold"
                       : isPast
-                      ? "text-white/80"
-                      : "text-slate-400"
-                  }`}
+                        ? "text-white/80"
+                        : "text-slate-400"
+                    }`}
                 >
                   {year}
                 </div>
@@ -459,12 +456,12 @@ export default function XploreDataHomepage() {
         <div className="max-w-6xl mx-auto">
           {/* header */}
           <div className="p-6 z-20">
-            <h1 className="text-2xl font-bold text-white">
+            {/* <h1 className="text-2xl font-bold text-white">
               Xplore
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
                 Data
               </span>
-            </h1>
+            </h1> */}
           </div>
 
           {/* Hero */}
@@ -474,6 +471,16 @@ export default function XploreDataHomepage() {
                 XploreData
               </span>
             </h2>
+            <div className="flex items-center justify-center mb-7 mt-5">
+              <div className="border flex items-center space-x-3 px-4 py-2 rounded-full bg-gray-800/50 border-cyan-400/30">
+                <img
+                  src="https://imgs.search.brave.com/g1a5xxmzRkIhv3A2zqV-q55_m7bBju-lI6z2OF85BRQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzA5LzMzLzk3LzU0/LzM2MF9GXzkzMzk3/NTQyOV9nbGc3NUpw/WFJBRzR4bHM1Vkxl/NmZEdkI0ZXNmWFE5/aC5qcGc"
+                  alt="XploreGov Logo"
+                  className="w-7"
+                />
+                <span className="text-white text-xl">Sri Lanka</span>
+              </div>
+            </div>
 
             <p className="text-lg text-slate-300 mb-6">
               Visualize Data Through Time — explore trends, compare sectors, and
