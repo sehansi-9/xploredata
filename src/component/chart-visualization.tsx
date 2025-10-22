@@ -168,7 +168,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                   const niceDomain = Math.ceil(maxVal / 5) * 5;
                   const tickVal = Math.round((niceDomain / 4) * (4 - i));
                   return (
-                    <div key={i} className="text-sm text-right pr-1">
+                    <div key={i} className="text-xs text-right pr-1">
                       {tickVal}
                     </div>
                   );
@@ -194,7 +194,8 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                     <XAxis
                       dataKey={xAxis}
                       stroke="var(--foreground)"
-                      tick={{ fontSize: 13 }}
+                      tick={{ fontSize: 12 }}
+                      interval={0}
                       tickFormatter={(value) => {
                         if (value.length > 10) {
                           return value.slice(0, 10) + "...";
