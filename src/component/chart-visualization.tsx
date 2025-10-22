@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import formatText from "@/utils/common_functions";
 
 interface ChartVisualizationProps {
   columns: string[];
@@ -18,14 +19,16 @@ interface ChartVisualizationProps {
 }
 
 const COLORS = [
-  "#FFA500",
-  "#FF8C00",
-  "#FF7F50",
-  "#FFB347",
-  "#FFAA33",
-  "#FFC04C",
-  "#FFD580",
+  "#004c99", // deep navy blue
+  "#0066cc", // darker blue
+  "#007bff", // primary blue
+  "#3399ff", // vivid blue
+  "#66b2ff", // medium blue
+  "#99ccff", // light blue
+  "#cce5ff", // very light blue
 ];
+
+
 
 export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
   const [xAxis, setXAxis] = useState<string>("district"); // Default to district if exists
@@ -115,7 +118,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                       );
                     }}
                   />
-                  <span className="break-words max-w-[220px]">{col}</span>
+                  <span className="break-words max-w-[220px]">{formatText({name: col})}</span>
                 </label>
               ))}
           </div>
