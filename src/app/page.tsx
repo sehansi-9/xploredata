@@ -484,7 +484,7 @@ export default function XploreDataHomepage() {
               onClick={() => router.push("/datasets")}
             >
               <Zap className="w-6 h-6" />
-              <span>XploreData</span>
+              <span>View data</span>
               <ChevronRight className="w-6 h-6" />
             </button>
           </section>
@@ -595,7 +595,7 @@ export default function XploreDataHomepage() {
               className="bg-none border-2 border-blue-500 rounded-xl px-3 py-2 text-base cursor-pointer inline-flex items-center"
             >
               <span className="underline inline-flex items-center gap-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-                XploreData
+                View data
                 <ChevronRight className="w-5 h-5 stroke-blue-500" />
               </span>
             </button>
