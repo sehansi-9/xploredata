@@ -31,14 +31,14 @@ export function DatasetView({ data }: DatasetViewProps) {
       </div>
 
       {/* Visualization Card */}
-      {/* <div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white">
+      <div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold">Visualizations</h3>
         </div>
         <div className="overflow-x-auto text-gray-500 text-sm italic">
           <ChartVisualization columns={dataset.columns} rows={dataset.rows} />
         </div>
-      </div> */}
+      </div>
 
       {/* Data Table Card */}
       <div className="border border-gray-200 rounded-xl p-4 shadow-sm bg-white">
