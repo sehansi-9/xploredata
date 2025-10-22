@@ -31,7 +31,7 @@ export function ExportButton({ columns, rows, filename }: ExportButtonProps) {
 
   const exportJSON = () => {
     const data = rows.map((row) => {
-      const obj: Record<string, any> = {}
+      const obj: Record<string, unknown> = {}
       columns.forEach((col, idx) => {
         obj[col] = row[idx]
       })

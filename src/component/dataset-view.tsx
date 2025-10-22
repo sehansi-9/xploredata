@@ -2,8 +2,7 @@
 
 import { ChartVisualization } from "./chart-visualization";
 import { DataTable } from "./data-table";
-import { useEffect, useState, useRef } from "react";
-import { ChevronDown } from "lucide-react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 

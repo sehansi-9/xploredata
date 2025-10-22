@@ -1,36 +1,30 @@
-'use client'
-import { useEffect, useState } from 'react'
+import { useState } from "react";
 
-interface PingDot {
-  top: string
-  left: string
-  delay: string
-  duration: string
+interface Dot {
+  top: string;
+  left: string;
+  delay: string;
+  duration: string;
 }
 
+const generateRandomDots = () =>
+  Array.from({ length: 18 }, () => ({
+    top: `${Math.random() * 100}%`,
+    left: `${Math.random() * 100}%`,
+    delay: `${Math.random() * 4}s`,
+    duration: `${2 + Math.random() * 2}s`,
+  }));
+
 export default function FloatingDots() {
-  const [dots, setDots] = useState<PingDot[]>([])
-
-  useEffect(() => {
-    // Only run on client
-    const generateRandomDots = () => {
-      return [...Array(18)].map(() => ({
-        top: `${Math.random() * 100}%`,
-        left: `${Math.random() * 100}%`,
-        delay: `${Math.random() * 4}s`,
-        duration: `${2 + Math.random() * 2}s`,
-      }))
-    }
-
-    setDots(generateRandomDots())
-  }, [])
+  // ✅ Initialize directly — no useEffect needed
+  const [dots] = useState(generateRandomDots);
 
   return (
-    <>
-      {dots.map((dot, i) => (
+    <div>
+      {dots.map((dot, index) => (
         <div
-          key={`float-${i}`}
-          className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-30 animate-ping"
+          key={index}
+          className="dot"
           style={{
             top: dot.top,
             left: dot.left,
@@ -39,6 +33,6 @@ export default function FloatingDots() {
           }}
         />
       ))}
-    </>
-  )
+    </div>
+  );
 }
