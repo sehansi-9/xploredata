@@ -8,7 +8,7 @@ import { useState } from "react";
 export default function Home() {
   const [selectedDataset, setSelectedDataset] =
     useState<DatasetWithYear | null>(null);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   return (

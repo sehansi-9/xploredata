@@ -68,7 +68,7 @@ export function DatasetView({ data }: DatasetViewProps) {
         <div className="overflow-x-auto">
           {loadingDatasetId ? (
             <div className="flex justify-center items-center h-48">
-              <ClipLoader size={25} color="#3B82F6" />
+              <ClipLoader size={25} color="text-border" />
             </div>
           ) : (
             selectDataset && (

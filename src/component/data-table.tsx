@@ -88,7 +88,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
         <table className="w-full min-w-max text-sm">
           <thead>
             <tr className="bg-muted border-b border-border">
-              {columns.map((column, index) => (
+              {columns && columns.map((column, index) => (
                 <th key={index} className="px-4 py-3 text-left">
                   <button
                     onClick={() => handleSort(index)}
@@ -123,7 +123,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
             ) : (
               <tr>
                 <td
-                  colSpan={columns.length}
+                  colSpan={columns ? columns.length : 0}
                   className="text-center py-6 text-gray-500"
                 >
                   No data found
