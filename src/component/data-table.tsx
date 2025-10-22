@@ -67,7 +67,7 @@ export function DataTable({ columns, rows, title }: DataTableProps) {
   };
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="space-y-4 w-full mt-6">
       {/* Search */}
       <div className="flex justify-end  gap-2">
         <input
