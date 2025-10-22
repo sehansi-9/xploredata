@@ -209,8 +209,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
                   }`}
                 />
                 <span className="text-sm font-medium">
-                  {/* {formatText({ name: category.name })} */}
-                  { category.name }
+                  {formatText({ name: category.name })}
                 </span>
 
                 {isLoading && (

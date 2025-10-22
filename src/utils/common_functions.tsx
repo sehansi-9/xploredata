@@ -1,21 +1,19 @@
-import React from "react";
-
 export default function formatText({ name }: { name: string }) {
   if (!name) return;
 
-  const withoutDate = name.replace(/\d{4}[-_]\d{2}[-_]\d{2}/g, '');
-  const nonUnderscoreName = withoutDate.replace(/_/g, " ");
+  const dateMatch = name.match(/(\d{4})[-_]\d{2}[-_]\d{2}/);
+  const year = dateMatch ? dateMatch[1] : "";
 
-  const firstSpaceIndex = nonUnderscoreName.indexOf(" ");
-  if (firstSpaceIndex === -1) {
-    return (
-      nonUnderscoreName.charAt(0).toUpperCase() + nonUnderscoreName.slice(1)
-    );
-  } else {
-    const firstWord = nonUnderscoreName.substring(0, firstSpaceIndex);
-    const restOfString = nonUnderscoreName.substring(firstSpaceIndex);
-    return (
-      firstWord.charAt(0).toUpperCase() + firstWord.slice(1) + restOfString
-    );
-  }
+  const withoutDate = name.replace(/\d{4}[-_]\d{2}[-_]\d{2}/g, "");
+
+  const cleaned = withoutDate.replace(/_/g, " ").trim();
+
+  const firstSpaceIndex = cleaned.indexOf(" ");
+  const capitalized =
+    firstSpaceIndex === -1
+      ? cleaned.charAt(0).toUpperCase() + cleaned.slice(1)
+      : cleaned.charAt(0).toUpperCase() +
+        cleaned.slice(1);
+
+  return year ? `${capitalized} ${year}` : capitalized;
 }
