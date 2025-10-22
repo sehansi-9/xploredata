@@ -209,7 +209,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
                   }`}
                 />
                 <span className="text-sm font-medium">
-                  {formatText({ name: category.name })}
+                  { formatText({ name: category.name }, { removeYear: level === 1 })}
                 </span>
 
                 {isLoading && (
@@ -260,14 +260,6 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           </Link>
         </h2>
       </div>
-
-      {/* Search */}
-      {/* <input
-        placeholder="Search datasets..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        className="m-2 p-2 rounded-sm border-2"
-      /> */}
 
       {/* Body */}
       {initialLoading ? (
