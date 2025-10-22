@@ -72,11 +72,21 @@ export function DatasetView({ data }: DatasetViewProps) {
             </div>
           ) : (
             selectDataset && (
-              <DataTable
-                columns={selectDataset?.columns}
-                rows={selectDataset?.rows}
-                title={selectDataset?.attributeName}
-              />
+              <>
+                <DataTable
+                  columns={selectDataset?.columns}
+                  rows={selectDataset?.rows}
+                  title={selectDataset?.attributeName}
+                />
+                <div className="border border-gray-200 rounded-xl p-4 shadow-sm mt-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Visualizations</h3>
+                  </div>
+                  <div className="overflow-x-auto text-gray-500 text-sm italic">
+                    <ChartVisualization columns={selectDataset.columns} rows={selectDataset.rows} />
+                  </div>
+                </div>
+              </>
             )
           )}
         </div>
