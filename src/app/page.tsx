@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
 import {
@@ -29,7 +29,6 @@ import {
 } from "recharts";
 
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell } from "recharts";
-import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
 import FloatingDots from "@/component/floating-dots";
 
@@ -452,7 +451,7 @@ export default function XploreDataHomepage() {
             <rect width="100%" height="100%" fill="url(#dataGrid)" />
           </svg>
         </div>
-        <FloatingDots/>
+        <FloatingDots />
       </div>
 
       {/* Main content container */}
@@ -522,8 +521,6 @@ export default function XploreDataHomepage() {
               <div className="mt-6">
                 <InteractiveChart activeYear={activeYear} />
               </div>
-
-              
 
               <div className="mt-6 space-y-3">
                 <div className="flex items-center p-3 rounded-lg bg-blue-950/20 border-l-4 border-blue-400">

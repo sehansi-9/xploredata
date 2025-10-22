@@ -1,11 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown, Database } from "lucide-react";
 import axios from "axios";
 import formatText from "@/utils/common_functions";
+import { ClipLoader } from "react-spinners";
+import Link from "next/link";
 
 export function Sidebar({ onSelectDataset }: SidebarProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set()
   );
@@ -16,7 +22,14 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     Map<string, Dataset[]>
   >(new Map());
   const [loadingDatasetId, setLoadingDatasetId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [initialLoading, setInitialLoading] = useState(false);
+  const [loadingCategoryId, setLoadingCategoryId] = useState<string | null>(
+    null
+  );
+  const [isRestoringFromUrl, setIsRestoringFromUrl] = useState(false);
 
+  // Fetch categories and datasets for a given parentId
   const fetchCategoriesAndDatasets = async (parentId: string = "") => {
     try {
       const url =
@@ -24,7 +37,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           ? `${process.env.NEXT_PUBLIC_API_URL}/categories`
           : `${process.env.NEXT_PUBLIC_API_URL}/categories?id=${parentId}`;
 
-      const response = await axios.get<FetchedData>(url, {
+      const response = await axios.get<YearBasedData>(url, {
         headers: { "Content-Type": "application/json" },
       });
 
@@ -36,7 +49,7 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
         return newMap;
       });
 
-      if (datasets) {
+      if (datasets && Object.keys(datasets).length !== 0) {
         const allDatasets = Object.values(datasets).flat();
         setDatasetsByParentId((prev) => {
           const newMap = new Map(prev);
@@ -44,32 +57,29 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
           return newMap;
         });
       }
+
+      return { categories, datasets };
     } catch (e) {
       console.error("Failed to fetch categories:", e);
+      return { categories: [], datasets: {} };
     }
   };
 
-  const handleDatasetClick = async (
-    datasetId: string,
-    datasetNameCode: string,
-    datasetParentId: string
-  ) => {
+  // Update URL when dataset is clicked
+  const updateUrl = (dataset: Dataset) => {
+    const params = new URLSearchParams();
+    params.set("datasetId", dataset.name);
+    params.set("datasetName", dataset.nameExact || dataset.name);
+    params.set("parentId", dataset.parentId || "");
+    router.push(`?${params.toString()}`, { scroll: false });
+  };
+
+  // When dataset is clicked
+  const handleDatasetClick = async (dataset: Dataset) => {
     try {
-      setLoadingDatasetId(datasetId);
-      const response = await axios.post<Dataset>(
-        `${process.env.NEXT_PUBLIC_API_URL}/data/attribute/${datasetParentId}`,
-        {
-          nameCode: datasetNameCode,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("clicked ");
-      console.log(response.data);
-      onSelectDataset(response.data);
+      setLoadingDatasetId(dataset.id);
+      updateUrl(dataset);
+      onSelectDataset(dataset);
     } catch (e) {
       console.error("Failed to fetch dataset:", e);
     } finally {
@@ -77,90 +87,196 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     }
   };
 
-  useEffect(() => {
-    fetchCategoriesAndDatasets();
-  }, []);
+  // Recursively expand categories to find a dataset
+  const expandPathToDataset = async (
+    datasetId: string,
+    parentId: string = ""
+  ): Promise<boolean> => {
+    console.log(datasetId);
+    // Fetch this level if not already fetched
+    if (!categoriesByParentId.has(parentId)) {
+      await fetchCategoriesAndDatasets(parentId);
+    }
 
+    const datasets = datasetsByParentId.get(parentId) || [];
+
+    // Check if dataset is at this level
+    if (datasets.some((ds) => ds.id === datasetId)) {
+      return true;
+    }
+
+    // Check child categories
+    const categories = categoriesByParentId.get(parentId) || [];
+    for (const category of categories) {
+      const found = await expandPathToDataset(datasetId, category.id);
+      if (found) {
+        setExpandedCategories((prev) => new Set([...prev, category.id]));
+        return true;
+      }
+    }
+
+    return false;
+  };
+
+  // Restore state from URL on mount
+  useEffect(() => {
+    const restoreFromUrl = async () => {
+      const datasetId = searchParams.get("datasetId");
+      const datasetParentId = searchParams.get("parentId");
+
+      if (datasetId && datasetParentId) {
+        setIsRestoringFromUrl(true);
+        setInitialLoading(true);
+
+        try {
+          // First load root categories
+          await fetchCategoriesAndDatasets();
+
+          // // Expand path to the dataset
+          await expandPathToDataset(datasetId);
+
+          // // Create dataset object from URL params
+          const dataset: Dataset = {
+            // id: datasetId,
+            name: datasetId,
+            // nameExact: datasetName,
+            parentId: datasetParentId,
+            // year: year || undefined,
+          };
+
+          // // Select the dataset
+          onSelectDataset(dataset);
+        } catch (e) {
+          console.error("Failed to restore from URL:", e);
+        } finally {
+          setInitialLoading(false);
+          setIsRestoringFromUrl(false);
+        }
+      } else {
+        // Normal initial load
+        setInitialLoading(true);
+        await fetchCategoriesAndDatasets();
+        setInitialLoading(false);
+      }
+    };
+
+    restoreFromUrl();
+  }, []); // Only run on mount
+
+  // Toggle expansion of a category
   const toggleCategory = async (categoryId: string) => {
     const newExpanded = new Set(expandedCategories);
 
     if (expandedCategories.has(categoryId)) {
       newExpanded.delete(categoryId);
+      setExpandedCategories(newExpanded);
     } else {
       newExpanded.add(categoryId);
+      setLoadingCategoryId(categoryId);
 
       if (!categoriesByParentId.has(categoryId)) {
         await fetchCategoriesAndDatasets(categoryId);
       }
-    }
 
-    setExpandedCategories(newExpanded);
+      setExpandedCategories(newExpanded);
+      setLoadingCategoryId(null);
+    }
   };
 
-  //categories and datasets
+  // Recursive rendering of categories and datasets
   const renderCategories = (parentId: string = "", level: number = 0) => {
     const categories = categoriesByParentId.get(parentId) || [];
     const datasets = datasetsByParentId.get(parentId) || [];
 
+    const currentDatasetId = searchParams.get("datasetId");
+
     return (
       <div className="space-y-1">
-        {categories.map((category) => (
-          <div key={category.id}>
+        {categories.map((category) => {
+          const isExpanded = expandedCategories.has(category.id);
+          const isLoading = loadingCategoryId === category.id;
+
+          return (
+            <div key={category.id}>
+              <button
+                onClick={() => toggleCategory(category.id)}
+                className={`w-full hover:cursor-pointer flex items-center gap-2 text-start px-3 py-2 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground`}
+                style={{ paddingLeft: `${level * 1.25 + 1}rem` }}
+              >
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform ${
+                    isExpanded ? "rotate-0" : "-rotate-90"
+                  }`}
+                />
+                <span className="text-sm font-medium">
+                  {formatText({ name: category.name })}
+                </span>
+
+                {isLoading && (
+                  <div className="ml-2 w-3 h-3 border-2 border-t-transparent border-sidebar-foreground rounded-full animate-spin" />
+                )}
+              </button>
+
+              {isExpanded && (
+                <div>{renderCategories(category.id, level + 1)}</div>
+              )}
+            </div>
+          );
+        })}
+
+        {datasets.map((dataset) => {
+          const isLoadingDataset = loadingDatasetId === dataset.id;
+          const isSelected = currentDatasetId === dataset.id;
+
+          return (
             <button
-              onClick={() => toggleCategory(category.id)}
-              className={`w-full flex items-center gap-2 text-start px-3 py-2 rounded-md transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground`}
-              style={{ paddingLeft: `${level * 1.25 + 1}rem` }}
+              key={dataset.id}
+              onClick={() => handleDatasetClick(dataset)}
+              className={`w-full text-left px-3 py-2 hover:cursor-pointer rounded-md text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground ${
+                isLoadingDataset ? "opacity-50 pointer-events-none" : ""
+              } ${isSelected ? "bg-sidebar-accent font-medium" : ""}`}
+              style={{ paddingLeft: `${(level + 1) * 1.25 + 1}rem` }}
             >
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  expandedCategories.has(category.id)
-                    ? "rotate-0"
-                    : "-rotate-90"
-                }`}
-              />
-              <span className="text-sm font-medium">
-                {formatText({ name: category.name })}
-              </span>
+              {isLoadingDataset
+                ? "Loading..."
+                : dataset.nameExact || dataset.name}
             </button>
-
-            {expandedCategories.has(category.id) && (
-              <div>{renderCategories(category.id, level + 1)}</div>
-            )}
-          </div>
-        ))}
-
-        {datasets.map((dataset) => (
-          <button
-            key={dataset.id}
-            onClick={() =>
-              handleDatasetClick(dataset.id, dataset.name, dataset.parentId)
-            }
-            className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sidebar-foreground ${
-              loadingDatasetId === dataset.id
-                ? "opacity-50 pointer-events-none"
-                : ""
-            }`}
-            style={{ paddingLeft: `${(level + 1) * 1.25 + 1}rem` }}
-          >
-            {loadingDatasetId === dataset.id
-              ? "Loading..."
-              : dataset.nameExact || dataset.name}
-          </button>
-        ))}
+          );
+        })}
       </div>
     );
   };
 
   return (
     <div className="w-2/9 bg-sidebar border-r border-sidebar-border overflow-y-auto h-full flex flex-col">
+      {/* Header */}
       <div className="p-4 border-b border-sidebar-border flex-shrink-0">
-        <h2 className="text-lg font-bold text-sidebar-foreground flex items-center gap-2">
-          <Database className="w-5 h-5 flex-shrink-0" />
-          <span className="truncate">XploreData</span>
+        <h2 className="text-lg font-bold text-sidebar-foreground">
+          <Link href="/" className="flex items-center gap-2">
+            <Database className="w-6 h-6 flex-shrink-0" />
+            <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent text-2xl">
+              XploreData
+            </span>
+          </Link>
         </h2>
       </div>
 
-      <div className="p-2 flex-1 overflow-y-auto">{renderCategories()}</div>
+      {/* Search */}
+      {/* <input
+        placeholder="Search datasets..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        className="m-2 p-2 rounded-sm border-2"
+      /> */}
+
+      {/* Body */}
+      {initialLoading ? (
+        <div className="w-full flex justify-center mt-10">
+          <ClipLoader size={25} color="text-border" />
+        </div>
+      ) : (
+        <div className="p-2 flex-1 overflow-y-auto">{renderCategories()}</div>
+      )}
     </div>
   );
 }

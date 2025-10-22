@@ -4,12 +4,6 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu"
 import { Download } from "lucide-react"
 import { useState } from "react"
 
-interface ExportButtonProps {
-  columns: string[]
-  rows: (string | number)[][]
-  filename: string
-}
-
 export function ExportButton({ columns, rows, filename }: ExportButtonProps) {
   const [open, setOpen] = useState(false)
 
@@ -101,7 +95,7 @@ export function ExportButton({ columns, rows, filename }: ExportButtonProps) {
   return (
     <DropdownMenu.Root open={open} onOpenChange={setOpen}>
       <DropdownMenu.Trigger asChild>
-        <button className="flex items-center gap-2 border rounded-md px-3 py-1 text-sm hover:bg-gray-100 transition">
+        <button className="flex hover:cursor-pointer bg-[oklch(65%_0.18_145)] items-center gap-2 border rounded-md px-3 py-1 text-sm transition">
           <Download className="w-4 h-4" />
           Export
         </button>

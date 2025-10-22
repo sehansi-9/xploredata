@@ -4,6 +4,7 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
+  
   /* Blue theme color scheme */
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.15 0 0);
@@ -47,11 +48,13 @@
   --sidebar-accent-foreground: oklch(1 0 0);
   --sidebar-border: oklch(0.92 0 0);
   --sidebar-ring: oklch(0.65 0.2 240);
+
+  --export-button: oklch(65% 0.18 145);
 }
 
 .dark {
   /* Dark mode adjustments for blue theme */
-  --background: oklch(0.12 0 0);
+  --background: oklch(18.264% 0.00204 286.052);
   --foreground: oklch(0.95 0 0);
   --card: oklch(0.15 0 0);
   --card-foreground: oklch(0.95 0 0);
@@ -83,7 +86,7 @@
   --chart-4: oklch(0.627 0.265 275);
   --chart-5: oklch(0.645 0.246 200);
 
-  --sidebar: oklch(0.12 0 0);
+  --sidebar: oklch(18.264% 0.00204 286.052);
   --sidebar-foreground: oklch(0.95 0 0);
 
   --sidebar-primary: oklch(0.65 0.2 240);
@@ -93,11 +96,11 @@
 
   --sidebar-border: oklch(0.25 0 0);
   --sidebar-ring: oklch(0.65 0.2 240);
+
+  --export-button: oklch(65% 0.18 145);
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -150,5 +153,11 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  }
+  
+  /* Ensure Poppins is applied to all text elements */
+  h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select {
+    font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   }
 }
