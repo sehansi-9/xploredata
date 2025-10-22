@@ -448,7 +448,7 @@ export default function XploreDataHomepage() {
             <rect width="100%" height="100%" fill="url(#dataGrid)" />
           </svg>
         </div>
-        <FloatingDots />
+        {/* <FloatingDots /> */}
       </div>
 
       {/* Main content container */}
@@ -594,7 +594,7 @@ export default function XploreDataHomepage() {
               Start Exploring Today
             </h3>
             <p className="text-gray-400 mb-8 max-w-2xl mx-auto">
-              Dive deep into Sri Lanka's data landscape and discover insights
+              Dive deep into Sri Lanka&apos;s data landscape and discover insights
               that matter.
             </p>
             <button

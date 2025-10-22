@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable */
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,12 +23,12 @@ export function Sidebar({ onSelectDataset }: SidebarProps) {
     Map<string, Dataset[]>
   >(new Map());
   const [loadingDatasetId, setLoadingDatasetId] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const [initialLoading, setInitialLoading] = useState(false);
   const [loadingCategoryId, setLoadingCategoryId] = useState<string | null>(
     null
   );
   const [isRestoringFromUrl, setIsRestoringFromUrl] = useState(false);
+  // console.log(isRestoringFromUrl)
 
   // Fetch categories and datasets for a given parentId
   const fetchCategoriesAndDatasets = async (parentId: string = "") => {

@@ -24,10 +24,16 @@ interface Dataset {
   kind: Kind;
 }
 
+// interface DatasetData {
+//   attributeName: string;
+//   columns: string[],
+//   rows: any[]
+// }
+
 interface DatasetData {
   attributeName: string;
-  columns: string[],
-  rows: any[]
+  columns: string[];
+  rows: Record<string, unknown>[]; 
 }
 
 interface ExportButtonProps {
