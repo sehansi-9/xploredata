@@ -287,6 +287,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                                 border: "1px solid var(--border)",
                                 borderRadius: "0.5rem",
                               }}
+                              formatter={(value, name) => [value, formatText({ name })]}
                             />
 
                             {selectedYColumns.map((col, i) => (
