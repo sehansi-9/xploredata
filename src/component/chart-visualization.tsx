@@ -145,7 +145,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                           backgroundColor: COLORS[i % COLORS.length],
                         }}
                       />
-                      <span className="text-sm">{col}</span>
+                      <span className="text-sm">{formatText({name: col})}</span>
                     </div>
                   ))}
                 </div>
@@ -237,12 +237,12 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                                 }
 
                                 return (
-                                  <g transform={`translate(${x},${y + 2})`}>
+                                  <g transform={`translate(${x},${y + 2.5})`}>
                                     <text
                                       x={0}
                                       y={0}
                                       textAnchor="middle"
-                                      fontSize={10}
+                                      fontSize={11.5}
                                       fill="var(--foreground)"
                                     >
                                       {line1}
@@ -252,7 +252,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                                         x={0}
                                         y={12}
                                         textAnchor="middle"
-                                        fontSize={10}
+                                        fontSize={11.5}
                                         fill="var(--foreground)"
                                       >
                                         {line2}
