@@ -77,6 +77,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
         <div className="space-y-6 w-full">
           {/* Controls */}
           <div className="bg-card border border-border rounded-lg p-4 space-y-4">
+            <h3 className="text-lg font-semibold">Visualizations</h3>
             <h3 className="text-sm font-semibold mb-2">Select Chart Data</h3>
 
             {/* X-axis selector */}
@@ -197,14 +198,14 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                         <div
                           style={{
                             minWidth: `${chartData.length * 100}px`,
-                            width: Math.max(chartData.length * 100, 600),
+                            width: Math.max(chartData.length * 100, 1000),
                             height: 450,
                             overflow: "hidden",
                           }}
                         >
                           <BarChart
                             data={chartData}
-                            width={Math.max(chartData.length * 100, 600)}
+                            width={Math.max(chartData.length * 100, 1000)}
                             height={450}
                             margin={{ left: 0, bottom: -60 }}
                             barCategoryGap="30%"
