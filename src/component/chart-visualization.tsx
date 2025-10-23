@@ -199,7 +199,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                           style={{
                             minWidth: `${chartData.length * 100}px`,
                             width: Math.max(chartData.length * 100, 1000),
-                            height: 450,
+                            height: 455,
                             overflow: "hidden",
                           }}
                         >
@@ -208,7 +208,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                             width={Math.max(chartData.length * 100, 1000)}
                             height={450}
                             margin={{ left: 0, bottom: -60 }}
-                            barCategoryGap="30%"
+                            barCategoryGap="15%"
                           >
                             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
 
@@ -287,7 +287,7 @@ export function ChartVisualization({ columns, rows }: ChartVisualizationProps) {
                                 border: "1px solid var(--border)",
                                 borderRadius: "0.5rem",
                               }}
-                              formatter={(value, name) => [value, formatText({ name })]}
+                              formatter={(value, name) => [value, formatText({ name: name as string })]}
                             />
 
                             {selectedYColumns.map((col, i) => (
